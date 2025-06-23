@@ -1,354 +1,153 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
+<!DOCTYPE html><html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A Bola Quadrada do Quico</title> <!-- Título da aba do navegador -->
-    <!-- Incluindo Tailwind CSS para estilização moderna e responsiva -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Estilos personalizados para o corpo e elementos */
-        body {
-            font-family: 'Inter', sans-serif;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-color: #f0f4f8; /* Cor de fundo suave */
-            margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        .container {
-            background-color: #ffffff;
-            padding: 25px;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 600px; /* Largura máxima para o container */
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        canvas {
-            border: 2px solid #a0aec0; /* Borda cinza para o canvas */
-            background-color: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            touch-action: none; /* Desabilita ações de toque padrão */
-            max-width: 100%; /* Garante responsividade */
-            height: auto;
-            margin-bottom: 20px;
-        }
-        input[type="range"] {
-            width: 100%;
-            margin: 15px 0;
-            -webkit-appearance: none;
-            height: 10px;
-            background: #cbd5e1;
-            outline: none;
-            opacity: 0.8;
-            transition: opacity .2s;
-            border-radius: 5px;
-        }
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 24px;
-            height: 24px;
-            background: #4299e1; /* Azul do Tailwind */
-            cursor: pointer;
-            border-radius: 50%;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-        input[type="range"]:hover {
-            opacity: 1;
-        }
-        .checkbox-group {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 15px;
-            flex-wrap: wrap; /* Quebra linha em telas menores */
-        }
-        .checkbox-group label {
-            display: flex;
-            align-items: center;
-            font-size: 1rem;
-            color: #4a5568; /* Texto cinza escuro */
-            cursor: pointer;
-        }
-        .checkbox-group input[type="checkbox"] {
-            margin-right: 8px;
-            width: 18px;
-            height: 18px;
-            accent-color: #4299e1; /* Cor do checkbox */
-            cursor: pointer;
-        }
-        .legend {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 15px;
-            font-size: 0.9rem;
-            color: #4a5568;
-            flex-wrap: wrap;
-        }
-        .legend-item {
-            display: flex;
-            align-items: center;
-        }
-        .color-box {
-            width: 20px;
-            height: 20px;
-            border-radius: 4px;
-            margin-right: 8px;
-            border: 1px solid #ccc;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bola Quadrada do Quico – Visualização Interativa</title>
+  <meta name="description" content="Experimento interativo que compara a bola euclidiana e a bola de Manhattan, inspirado no meme do Quico.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f0f4f8;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background-color: #fff;
+      padding: 25px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    canvas {
+      border: 2px solid #a0aec0;
+      border-radius: 12px;
+      max-width: 100%;
+      height: auto;
+      margin-bottom: 20px;
+    }
+    .legend {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      font-size: 0.9rem;
+      color: #4a5568;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+    }
+    .color-box {
+      width: 20px;
+      height: 20px;
+      margin-right: 8px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+  </style>
 </head>
-<body class="bg-blue-50">
-    <div class="container">
-        <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-6">
-            A Bola Quadrada do Quico
-        </h1> <!-- Título visível na página -->
+<body>
+  <div class="container">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">A Bola Quadrada do Quico</h1>
+    <canvas id="geometryCanvas" width="500" height="500"></canvas><label for="radiusSlider" class="block text-lg font-semibold text-gray-700 mb-2">
+  Raio: <span id="currentRadius">5.0</span>
+</label>
+<input type="range" id="radiusSlider" min="10" max="100" value="50" class="w-full mb-4">
 
-        <canvas id="geometryCanvas" width="500" height="500"></canvas>
+<div class="flex justify-center gap-6 flex-wrap mb-4">
+  <label class="flex items-center gap-2">
+    <input type="checkbox" id="toggleEuclidean" checked>
+    Círculo Euclidiano
+  </label>
+  <label class="flex items-center gap-2">
+    <input type="checkbox" id="toggleManhattan" checked>
+    Bola Quadrada
+  </label>
+</div>
 
-        <div class="w-full">
-            <label for="radiusSlider" class="block text-lg font-semibold text-gray-700 mb-2">
-                Raio (<span id="currentRadius">5.0</span>)
-            </label>
-            <input type="range" id="radiusSlider" min="10" max="100" value="50">
-        </div>
+<div class="legend">
+  <div class="legend-item">
+    <div class="color-box bg-blue-500"></div>
+    Euclidiano (x² + y² = R²)
+  </div>
+  <div class="legend-item">
+    <div class="color-box bg-red-500"></div>
+    Manhattan (|x| + |y| = R)
+  </div>
+</div>
 
-        <div class="checkbox-group">
-            <label>
-                <input type="checkbox" id="toggleEuclidean" checked>
-                Círculo Euclidiano (Bola Redonda)
-            </label>
-            <label>
-                <input type="checkbox" id="toggleManhattan" checked>
-                Bola Quadrada do Quico
-            </label>
-        </div>
+  </div>  <script>
+    const canvas = document.getElementById('geometryCanvas');
+    const ctx = canvas.getContext('2d');
+    const radiusSlider = document.getElementById('radiusSlider');
+    const currentRadiusSpan = document.getElementById('currentRadius');
+    const toggleEuclidean = document.getElementById('toggleEuclidean');
+    const toggleManhattan = document.getElementById('toggleManhattan');
 
-        <div class="legend">
-            <div class="legend-item">
-                <div class="color-box bg-blue-500"></div>
-                Círculo Euclidiano ($x^2 + y^2 = R^2$)
-            </div>
-            <div class="legend-item">
-                <div class="color-box bg-red-500"></div>
-                Bola Quadrada ($|x| + |y| = R$)
-            </div>
-        </div>
-    </div>
+    let scale = 25;
+    let currentRadius = 5.0;
 
-    <script>
-        const canvas = document.getElementById('geometryCanvas');
-        const ctx = canvas.getContext('2d');
-        const radiusSlider = document.getElementById('radiusSlider');
-        const currentRadiusSpan = document.getElementById('currentRadius');
-        const toggleEuclidean = document.getElementById('toggleEuclidean');
-        const toggleManhattan = document.getElementById('toggleManhattan');
+    function resizeCanvas() {
+      const size = Math.min(window.innerWidth - 40, window.innerHeight - 200, 500);
+      canvas.width = size;
+      canvas.height = size;
+      draw();
+    }
 
-        // Escala para converter unidades do plano cartesiano em pixels.
-        // O valor 25 significa que 1 unidade no plano cartesiano corresponde a 25 pixels no canvas.
-        let scale = 25; 
-        let currentRadiusValue = 5.0; // Valor inicial do raio
+    function drawAxes() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.strokeStyle = '#ccc';
+      ctx.lineWidth = 1;
 
-        /**
-         * @function resizeCanvas
-         * @description Ajusta o tamanho do canvas de forma responsiva para se adaptar à tela.
-         */
-        function resizeCanvas() {
-            // Define o tamanho do canvas como o menor valor entre a largura/altura disponível na janela
-            // e um tamanho máximo de 500px, para garantir que caiba em telas menores e não fique gigante.
-            const size = Math.min(window.innerWidth - 40, window.innerHeight - 200, 500);
-            canvas.width = size;
-            canvas.height = size;
-            updateVisualization(); // Redesenha tudo após o redimensionamento
-        }
+      ctx.beginPath();
+      ctx.moveTo(0, canvas.height / 2);
+      ctx.lineTo(canvas.width, canvas.height / 2);
+      ctx.stroke();
 
-        /**
-         * @function drawAxes
-         * @description Desenha os eixos cartesianos (X e Y) no centro do canvas.
-         * Também desenha algumas marcações de escala nos eixos.
-         */
-        function drawAxes() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height); // Limpa o canvas para redesenhar
-            ctx.strokeStyle = '#cccccc'; // Cor da linha dos eixos (cinza claro)
-            ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(canvas.width / 2, 0);
+      ctx.lineTo(canvas.width / 2, canvas.height);
+      ctx.stroke();
+    }
 
-            // Desenha o eixo X (horizontal)
-            ctx.beginPath();
-            ctx.moveTo(0, canvas.height / 2);
-            ctx.lineTo(canvas.width, canvas.height / 2);
-            ctx.stroke();
+    function drawCircle(radius) {
+      ctx.strokeStyle = '#4299e1';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(canvas.width / 2, canvas.height / 2, radius * scale, 0, 2 * Math.PI);
+      ctx.stroke();
+    }
 
-            // Desenha o eixo Y (vertical)
-            ctx.beginPath();
-            ctx.moveTo(canvas.width / 2, 0);
-            ctx.lineTo(canvas.width / 2, canvas.height);
-            ctx.stroke();
+    function drawSquare(radius) {
+      ctx.strokeStyle = '#ef4444';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(canvas.width / 2 + radius * scale, canvas.height / 2);
+      ctx.lineTo(canvas.width / 2, canvas.height / 2 - radius * scale);
+      ctx.lineTo(canvas.width / 2 - radius * scale, canvas.height / 2);
+      ctx.lineTo(canvas.width / 2, canvas.height / 2 + radius * scale);
+      ctx.closePath();
+      ctx.stroke();
+    }
 
-            // Desenha as marcações de escala e números nos eixos
-            ctx.fillStyle = '#666666'; // Cor do texto dos números (cinza escuro)
-            ctx.font = '10px Arial'; // Fonte para os números
+    function draw() {
+      drawAxes();
+      if (toggleEuclidean.checked) drawCircle(currentRadius);
+      if (toggleManhattan.checked) drawSquare(currentRadius);
+    }
 
-            // Calcula o número de marcações visíveis com base no raio máximo
-            const maxAxisValue = Math.ceil((Math.min(canvas.width, canvas.height) / 2) / scale);
+    radiusSlider.oninput = function () {
+      currentRadius = this.value / 10;
+      currentRadiusSpan.textContent = currentRadius.toFixed(1);
+      draw();
+    };
 
-            for (let i = -maxAxisValue; i <= maxAxisValue; i++) {
-                if (i === 0) continue; // Pula a origem para evitar redundância
-
-                // Marcas e números no eixo X
-                const xCoord = canvas.width / 2 + i * scale;
-                ctx.fillText(i.toString(), xCoord - (i < 0 ? 10 : (i > 0 ? 5 : 0)), canvas.height / 2 + 15);
-                ctx.beginPath();
-                ctx.moveTo(xCoord, canvas.height / 2 - 4);
-                ctx.lineTo(xCoord, canvas.height / 2 + 4);
-                ctx.stroke();
-
-                // Marcas e números no eixo Y
-                const yCoord = canvas.height / 2 - i * scale;
-                ctx.fillText(i.toString(), canvas.width / 2 - (i < 0 ? 20 : 15), yCoord + 5);
-                ctx.beginPath();
-                ctx.moveTo(canvas.width / 2 - 4, yCoord);
-                ctx.lineTo(canvas.width / 2 + 4, yCoord);
-                ctx.stroke();
-            }
-        }
-
-        /**
-         * @function drawEuclideanCircle
-         * @description Desenha um círculo (a "bola redonda" usual) no canvas.
-         * A equação é x^2 + y^2 = R^2.
-         * @param {number} radius - O raio do círculo.
-         */
-        function drawEuclideanCircle(radius) {
-            ctx.strokeStyle = '#4299e1'; // Cor da linha do círculo (azul do Tailwind)
-            ctx.lineWidth = 3;
-
-            ctx.beginPath();
-            // Desenha o círculo usando a função arc, centrada na origem do canvas.
-            ctx.arc(canvas.width / 2, canvas.height / 2, radius * scale, 0, Math.PI * 2);
-            ctx.stroke();
-        }
-
-        /**
-         * @function drawManhattanSquare
-         * @description Desenha a "bola quadrada" (losango) no canvas, baseada na Distância de Manhattan.
-         * A equação é |x| + |y| = R.
-         * @param {number} radius - O "raio" da bola quadrada.
-         */
-        function drawManhattanSquare(radius) {
-            ctx.strokeStyle = '#ef4444'; // Cor da linha da bola quadrada (vermelho do Tailwind)
-            ctx.lineWidth = 3;
-
-            ctx.beginPath();
-            // A bola quadrada tem vértices em (R,0), (0,R), (-R,0), (0,-R) no plano cartesiano.
-            // Converte essas coordenadas para pixels no canvas.
-
-            // Ponto 1: (R, 0)
-            ctx.moveTo(canvas.width / 2 + radius * scale, canvas.height / 2);
-
-            // Ponto 2: (0, R)
-            ctx.lineTo(canvas.width / 2, canvas.height / 2 - radius * scale);
-
-            // Ponto 3: (-R, 0)
-            ctx.lineTo(canvas.width / 2 - radius * scale, canvas.height / 2);
-
-            // Ponto 4: (0, -R)
-            ctx.lineTo(canvas.width / 2, canvas.height / 2 + radius * scale);
-
-            ctx.closePath(); // Fecha o caminho, conectando o último ponto ao primeiro
-            ctx.stroke();
-        }
-
-        /**
-         * @function updateVisualization
-         * @description Função principal que redesenha os eixos e as formas (círculo/quadrado)
-         * com base nos valores atuais do raio e nas opções de visibilidade.
-         */
-        function updateVisualization() {
-            drawAxes(); // Sempre desenha os eixos
-
-            if (toggleEuclidean.checked) {
-                drawEuclideanCircle(currentRadiusValue);
-            }
-            if (toggleManhattan.checked) {
-                drawManhattanSquare(currentRadiusValue);
-            }
-        }
-
-        // Listener para o slider de raio:
-        // Quando o valor do slider muda, atualiza o raio e redesenha.
-        radiusSlider.oninput = function() {
-            // Converte o valor do slider (10-100) para um raio mais gerenciável (1.0-10.0)
-            currentRadiusValue = this.value / 10;
-            currentRadiusSpan.textContent = currentRadiusValue.toFixed(1); // Exibe com uma casa decimal
-            updateVisualization(); // Redesenha tudo com o novo raio
-        }
-
-        // Listeners para os checkboxes:
-        // Quando um checkbox é marcado/desmarcado, redesenha para mostrar/esconder a forma.
-        toggleEuclidean.onchange = updateVisualization;
-        toggleManhattan.onchange = updateVisualization;
-
-        // Event listener para teclas do teclado (alternativa para touch)
-        // Permite ajustar o raio com as setas para cima/baixo.
-        document.addEventListener('keydown', (event) => {
-            let step = 0.5; // Incremento/decremento do raio
-            if (event.key === 'ArrowUp') {
-                currentRadiusValue = Math.min(10, currentRadiusValue + step); // Limite máximo de 10
-                radiusSlider.value = currentRadiusValue * 10; // Atualiza o slider
-                currentRadiusSpan.textContent = currentRadiusValue.toFixed(1);
-                updateVisualization();
-            } else if (event.key === 'ArrowDown') {
-                currentRadiusValue = Math.max(1, currentRadiusValue - step); // Limite mínimo de 1
-                radiusSlider.value = currentRadiusValue * 10; // Atualiza o slider
-                currentRadiusSpan.textContent = currentRadiusValue.toFixed(1);
-                updateVisualization();
-            }
-        });
-
-        // Adiciona suporte a gestos de swipe vertical no canvas para ajustar o raio (mobile touch)
-        let startY = 0;
-        canvas.addEventListener('touchstart', (e) => {
-            startY = e.touches[0].clientY; // Pega a posição Y inicial do toque
-        });
-
-        canvas.addEventListener('touchend', (e) => {
-            const endY = e.changedTouches[0].clientY; // Pega a posição Y final do toque
-            const diffY = endY - startY; // Calcula a diferença de movimento vertical
-
-            if (Math.abs(diffY) > 20) { // Se o movimento for significativo (mais de 20 pixels)
-                let step = 0.5;
-                if (diffY < 0) { // Swipe para cima (diminui Y, aumenta o raio)
-                    currentRadiusValue = Math.min(10, currentRadiusValue + step);
-                } else { // Swipe para baixo (aumenta Y, diminui o raio)
-                    currentRadiusValue = Math.max(1, currentRadiusValue - step);
-                }
-                radiusSlider.value = currentRadiusValue * 10; // Atualiza o slider visual
-                currentRadiusSpan.textContent = currentRadiusValue.toFixed(1); // Atualiza o texto do raio
-                updateVisualization(); // Redesenha a visualização
-            }
-        });
-
-        // Inicialização: Ajusta o tamanho do canvas e desenha as formas quando a janela carrega.
-        window.onload = function() {
-            resizeCanvas();
-            updateVisualization();
-        }
-
-        // Listener para redimensionamento da janela:
-        // Garante que o canvas se ajuste e redesenhe quando a janela for redimensionada.
-        window.onresize = resizeCanvas;
-    </script>
-</body>
+    toggleEuclidean.onchange = draw;
+    toggleManhattan.onchange = draw;
+    window.onresize = resizeCanvas;
+    window.onload = () => { resizeCanvas(); draw(); };
+  </script></body>
 </html>
-
